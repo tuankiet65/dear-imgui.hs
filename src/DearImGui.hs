@@ -338,6 +338,8 @@ module DearImGui
   , Raw.getForegroundDrawList
   , Raw.imCol32
 
+  , setScrollHereY
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs
@@ -350,6 +352,8 @@ import Control.Monad
 import Data.Bool
 import Data.Foldable
   ( foldl' )
+import Data.Maybe
+  ( fromMaybe )
 import Foreign
 import Foreign.C
 
@@ -1950,6 +1954,11 @@ setNextWindowCollapsed b cond = liftIO do
 setNextWindowBgAlpha :: (MonadIO m) => Float -> m ()
 setNextWindowBgAlpha alpha = liftIO do
   Raw.setNextWindowBgAlpha (CFloat alpha)
+
+setScrollHereY :: (MonadIO m) => Maybe Float -> m ()
+setScrollHereY maybeCenterYRatio = liftIO do
+  let centerYRatio = fromMaybe 0.5 maybeCenterYRatio
+  Raw.setScrollHereY (CFloat centerYRatio)
 
 
 -- | Add a dummy item of given size. unlike `invisibleButton`, `dummy` won't take the mouse click or be navigable into.

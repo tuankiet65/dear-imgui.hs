@@ -250,6 +250,8 @@ module DearImGui.Raw
   , getForegroundDrawList
   , imCol32
 
+  , setScrollHereY
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs
@@ -1579,6 +1581,10 @@ setNextWindowCollapsed b cond = liftIO do
 setNextWindowBgAlpha :: (MonadIO m) => CFloat -> m ()
 setNextWindowBgAlpha alpha = liftIO do
   [C.exp| void { SetNextWindowBgAlpha($(float alpha)) } |]
+
+setScrollHereY :: (MonadIO m) => CFloat -> m ()
+setScrollHereY centerYRatio = liftIO do
+  [C.exp| void { SetScrollHereY($(float centerYRatio)) } |]
 
 
 -- | undo a sameLine or force a new line when in an horizontal-layout context.
