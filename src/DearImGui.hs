@@ -175,6 +175,7 @@ module DearImGui
 
     -- ** Text Input
   , inputText
+  , inputTextWithFlags
   , inputTextMultiline
   , inputTextWithHint
 
@@ -1231,6 +1232,15 @@ inputText label ref bufSize =
           labelPtr
           bufPtrLen
           ImGuiInputTextFlags_None
+
+inputTextWithFlags :: (MonadIO m, HasSetter ref Text, HasGetter ref Text) => Text -> ref -> Int -> ImGuiInputTextFlags -> m Bool
+inputTextWithFlags label ref bufSize flags =
+  withInputString ref bufSize \bufPtrLen ->
+      Text.withCString label \labelPtr ->
+        Raw.inputText
+          labelPtr
+          bufPtrLen
+          flags
 
 
 -- | Wraps @ImGui::InputTextMultiline()@.
