@@ -328,8 +328,10 @@ module DearImGui
 
     -- ** ListClipper
   , withListClipper
+  , withListClipperAndInclude
   , ClipItems(..)
   , ClipRange(..)
+  , ListClipperInclude(..)
 
     -- ** Miscellaneous
   , Raw.getBackgroundDrawList
@@ -2090,6 +2092,8 @@ popStyleVar n = liftIO do
 withFont :: MonadUnliftIO m => Raw.Font.Font -> m a -> m a
 withFont font = bracket_ (Raw.Font.pushFont font) Raw.Font.popFont
 
+data ListClipperInclude = ListClipperInclude Int Int
+
 -- | Clips a large list of items
 --
 -- The requirements on @a@ are that they are all of the same height.
@@ -2106,6 +2110,36 @@ withListClipper itemHeight items action =
     step clipper = do
       Raw.ListClipper.begin clipper itemCount' itemHeight'
       go clipper
+
+    go clipper = do
+      doStep <- Raw.ListClipper.step clipper
+      when doStep do
+        let
+          startIndex = fromIntegral $ Raw.ListClipper.displayStart clipper
+          endIndex   = fromIntegral $ Raw.ListClipper.displayEnd clipper
+        stepItems action $
+          clipItems startIndex endIndex items
+
+        go clipper
+
+withListClipperAndInclude :: (ClipItems t a, MonadUnliftIO m) => Maybe Float -> Maybe ListClipperInclude -> t a -> (a -> m ()) -> m ()
+withListClipperAndInclude itemHeight listClipperInclude items action =
+  bracket
+    (liftIO $ throwIfNull "withListClipper: ListClipper allocation failed" Raw.ListClipper.new)
+    Raw.ListClipper.delete
+    step
+  where
+    itemHeight' = maybe (-1.0) CFloat itemHeight
+    itemCount' = maybe maxBound fromIntegral (itemCount items)
+
+    step clipper = do
+      Raw.ListClipper.begin clipper itemCount' itemHeight'
+
+      case listClipperInclude of
+        Nothing -> go clipper
+        Just (ListClipperInclude from to) -> do
+          Raw.ListClipper.includeItemsByIndex clipper (fromIntegral from) (fromIntegral to)
+          go clipper
 
     go clipper = do
       doStep <- Raw.ListClipper.step clipper

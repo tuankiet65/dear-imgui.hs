@@ -48,6 +48,7 @@ module DearImGui.Raw.ListClipper
   , begin
   , displayStart
   , displayEnd
+  , includeItemsByIndex
   , step
   )
   where
@@ -113,6 +114,14 @@ begin clipper items_count items_height = liftIO do
   [C.block|
     void {
       $(ImGuiListClipper* clipper)->Begin($(int items_count), $(float items_height));
+    }
+  |]
+
+includeItemsByIndex :: (MonadIO m) => ListClipper -> CInt -> CInt -> m ()
+includeItemsByIndex clipper item_begin item_end = liftIO do
+  [C.block|
+    void {
+      $(ImGuiListClipper* clipper)->IncludeItemsByIndex($(int item_begin), $(int item_end));
     }
   |]
 
