@@ -22,6 +22,7 @@ extra-source-files:
   imgui/backends/*.h,
   imgui/backends/*.mm,
   imgui/imconfig.h,
+  imgui_club/imgui_memory_editor/imgui_memory_editor.h,
   imgui/LICENSE.txt
 
 common exe-flags
@@ -159,6 +160,7 @@ library
     DearImGui.Raw.Font.GlyphRanges
     DearImGui.Raw.IO
     DearImGui.Raw.ListClipper
+    DearImGui.Raw.MemoryEditor
     DearImGui.Raw.Context
   other-modules:
     DearImGui.Enums
@@ -174,6 +176,7 @@ library
     stdc++
   include-dirs:
     imgui
+    imgui_club
   build-depends:
       dear-imgui-generator
     , containers

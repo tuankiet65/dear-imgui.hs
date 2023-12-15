@@ -343,6 +343,9 @@ module DearImGui
 
   , withDisabled
 
+  , MemoryEditorOptions(..)
+  , memoryEditor
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs
@@ -368,6 +371,7 @@ import qualified DearImGui.Internal.Text as Text
 import qualified DearImGui.Raw as Raw
 import qualified DearImGui.Raw.Font as Raw.Font
 import qualified DearImGui.Raw.ListClipper as Raw.ListClipper
+import qualified DearImGui.Raw.MemoryEditor as Raw.MemoryEditor
 
 -- managed
 import qualified Control.Monad.Managed as Managed
@@ -2230,3 +2234,31 @@ instance (Ord a, Enum a, Num a) => ClipItems ClipRange a where
 
 withDisabled :: MonadUnliftIO m => m () -> m ()
 withDisabled = bracket_ Raw.beginDisabled Raw.endDisabled
+
+data MemoryEditorOptions = MemoryEditorOptions
+  { readOnly :: Bool,
+    showDataPreview :: Bool
+  } deriving Show
+
+memoryEditor :: MonadIO m => Text -> MemoryEditorOptions -> VS.Vector Word8 -> m ()
+memoryEditor label options vector = liftIO $ Managed.runManaged do
+  labelCString <- Managed.managed $ Text.withCString label
+
+  memoryEditorPtr <-
+    Managed.managed $
+      bracket
+        Raw.MemoryEditor.new
+        Raw.MemoryEditor.delete
+
+  Raw.MemoryEditor.setReadOnly memoryEditorPtr (bool 0 1 $ readOnly options)
+  -- Raw.MemoryEditor.setReadOnly memoryEditorPtr (bool 0 1 $ showDataPreview options)
+
+  vectorPtr <- Managed.managed $ VS.unsafeWith vector
+  let vectorSize = VS.length vector
+
+  Raw.MemoryEditor.drawWindow
+    memoryEditorPtr
+    labelCString
+    (castPtr vectorPtr)
+    (fromIntegral vectorSize)
+    0x0000
