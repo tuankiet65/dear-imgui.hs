@@ -252,6 +252,9 @@ module DearImGui.Raw
 
   , setScrollHereY
 
+  , beginDisabled
+  , endDisabled
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs
@@ -1822,3 +1825,11 @@ imCol32 r g b a = unsafePerformIO
       )
     }
   |]
+
+beginDisabled :: (MonadIO m) => m ()
+beginDisabled = liftIO do
+  [C.exp| void { BeginDisabled() } |]
+
+endDisabled :: (MonadIO m) => m ()
+endDisabled = liftIO do
+  [C.exp| void { EndDisabled() } |]

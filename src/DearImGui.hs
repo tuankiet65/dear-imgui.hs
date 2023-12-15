@@ -341,6 +341,8 @@ module DearImGui
 
   , setScrollHereY
 
+  , withDisabled
+
     -- * Types
   , module DearImGui.Enums
   , module DearImGui.Structs
@@ -2225,3 +2227,6 @@ instance (Ord a, Enum a, Num a) => ClipItems ClipRange a where
 
   stepItems action (ClipRange start end) =
     mapM_ action [start .. end - 1]
+
+withDisabled :: MonadUnliftIO m => m () -> m ()
+withDisabled = bracket_ Raw.beginDisabled Raw.endDisabled
