@@ -128,6 +128,7 @@ module DearImGui
 
     -- ** Main
   , button
+  , buttonWithSize
   , smallButton
   , invisibleButton
   , arrowButton
@@ -551,6 +552,11 @@ button :: MonadIO m => Text -> m Bool
 button label = liftIO do
   Text.withCString label Raw.button
 
+buttonWithSize :: MonadIO m => Text -> ImVec2 -> m Bool
+buttonWithSize label size = liftIO do
+  Text.withCString label \labelPtr ->
+    with size \sizePtr ->
+      Raw.buttonWithSize labelPtr sizePtr
 
 -- | Button with @FramePadding=(0,0)@ to easily embed within text.
 --

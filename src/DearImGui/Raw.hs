@@ -106,6 +106,7 @@ module DearImGui.Raw
 
     -- ** Main
   , button
+  , buttonWithSize
   , smallButton
   , invisibleButton
   , arrowButton
@@ -574,6 +575,9 @@ button :: (MonadIO m) => CString -> m Bool
 button labelPtr = liftIO do
   (0 /=) <$> [C.exp| bool { Button($(char* labelPtr)) } |]
 
+buttonWithSize :: (MonadIO m) => CString -> Ptr ImVec2 -> m Bool
+buttonWithSize labelPtr sizePtr = liftIO do
+  (0 /=) <$> [C.exp| bool { Button($(char* labelPtr), *$(ImVec2* sizePtr)) } |]
 
 -- | Button with @FramePadding=(0,0)@ to easily embed within text.
 --
